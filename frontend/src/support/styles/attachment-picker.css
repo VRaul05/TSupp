@@ -1,0 +1,95 @@
+.attachment-picker {
+  width: 100%;
+  min-width: 0;
+  color: #42230f;
+}
+.attachment-picker *, .attachment-camera * { box-sizing: border-box; }
+.attachment-picker__label {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+.attachment-picker__label > svg { color: #8e5008; flex: 0 0 auto; }
+.attachment-picker__optional { color: #8e8176; font-weight: 400; }
+.attachment-picker__zone {
+  width: 100%;
+  min-width: 0;
+  padding: 12px 11px 10px;
+  border: 1px dashed #ed9a44;
+  border-radius: 16px;
+  background: #fff0e7;
+  transition: background-color .15s ease, box-shadow .15s ease;
+}
+.attachment-picker__zone--dragging { background: #ffe3cb; box-shadow: 0 0 0 3px #ffae5b35; }
+.attachment-picker__actions { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 11px; }
+.attachment-picker__tile {
+  appearance: none;
+  display: flex;
+  min-width: 0;
+  min-height: 121px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  margin: 0;
+  padding: 13px 8px 12px;
+  border: 1px solid #ed9a44;
+  border-radius: 12px;
+  background: #fff;
+  color: #8b5008;
+  cursor: pointer;
+  font-family: inherit;
+  line-height: 1.25;
+  text-align: center;
+  transition: background-color .15s ease, border-color .15s ease;
+}
+.attachment-picker__tile:hover:not(:disabled) { background: #fffaf6; border-color: #ca721a; }
+.attachment-picker__tile:focus-visible, .attachment-camera button:focus-visible { outline: 3px solid #9f5b08; outline-offset: 3px; }
+.attachment-picker__tile:disabled { cursor: not-allowed; opacity: .6; }
+.attachment-picker__tile strong { margin-top: 4px; color: #8b5008; font-size: 16px; font-weight: 700; }
+.attachment-picker__icon { display: grid; width: 45px; height: 45px; flex: 0 0 auto; place-items: center; border-radius: 50%; background: #ffdfc7; color: #8b5008; }
+.attachment-picker__hint { color: #8e8176; font-size: 12px; font-weight: 400; }
+.attachment-picker__drag-hint { display: flex; min-height: 17px; align-items: center; justify-content: center; gap: 6px; margin-top: 9px; color: #8b5008; font-size: 12px; font-weight: 500; line-height: 1.4; text-align: center; }
+.attachment-picker__drag-hint > svg { flex: 0 0 auto; }
+.attachment-picker .attachment-picker__limits { display: flex; align-items: flex-start; gap: 5px; margin: 13px 0 0; color: #8e8176; font-size: 11.5px; font-weight: 400; line-height: 1.5; }
+.attachment-picker__limits > svg { flex: 0 0 auto; margin-top: 1px; }
+.attachment-picker .attachment-picker__error, .attachment-camera .attachment-picker__error { margin: 9px 0 0; color: #a43325; font-size: 13px; font-weight: 500; line-height: 1.5; overflow-wrap: anywhere; }
+.attachment-picker__input { display: none !important; }
+.attachment-picker__spinner { animation: attachment-picker-spin 1s linear infinite; }
+@keyframes attachment-picker-spin { to { transform: rotate(360deg); } }
+.attachment-camera { position: fixed; z-index: 90; inset: 0; display: flex; align-items: center; justify-content: center; padding: 20px; background: #211509a8; }
+.attachment-camera__dialog { width: min(100%, 680px); max-height: calc(100dvh - 40px); overflow-y: auto; border: 1px solid #f2d2bb; border-radius: 20px; background: #fffcf9; color: #42230f; box-shadow: 0 20px 90px #0004; }
+.attachment-camera__header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 17px 20px; border-bottom: 1px solid #f0dccb; }
+.attachment-camera__header h2 { display: flex; align-items: center; gap: 9px; margin: 0; font-size: 19px; }
+.attachment-camera__close { display: grid; width: 36px; height: 36px; flex: 0 0 auto; place-items: center; padding: 0; border: 0; border-radius: 9px; background: transparent; color: #8b5008; cursor: pointer; }
+.attachment-camera__close:hover { background: #ffeadb; }
+.attachment-camera__preview { display: flex; min-height: 220px; align-items: center; justify-content: center; margin: 16px 20px 0; overflow: hidden; border-radius: 12px; background: #251d17; }
+.attachment-camera__preview video, .attachment-camera__preview img { display: block; width: 100%; max-height: 52dvh; object-fit: contain; }
+.attachment-camera__status { display: flex; min-height: 220px; align-items: center; justify-content: center; flex-direction: column; gap: 14px; padding: 20px; color: #ffdfc7; text-align: center; }
+.attachment-camera .attachment-camera__error { margin: 14px 20px 0; }
+.attachment-camera__footer { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 9px; padding: 18px 20px 20px; }
+.attachment-camera__button { display: inline-flex; min-height: 42px; align-items: center; justify-content: center; gap: 7px; padding: 10px 15px; border: 1px solid #dfbda3; border-radius: 11px; background: #fff; color: #653d1f; cursor: pointer; font-family: inherit; font-size: 13px; font-weight: 600; line-height: 1.3; }
+.attachment-camera__button--primary { border-color: #f7942f; background: #ff962e; color: #40250e; }
+.attachment-camera__button:hover:not(:disabled) { filter: brightness(.97); }
+.attachment-camera button:disabled { cursor: not-allowed; opacity: .6; }
+@media (max-width: 420px) {
+  .attachment-picker__zone { padding: 10px 9px; border-radius: 14px; }
+  .attachment-picker__actions { gap: 9px; }
+  .attachment-picker__tile { min-height: 117px; padding: 12px 5px; }
+  .attachment-picker__tile strong { font-size: 14px; }
+  .attachment-picker__hint { font-size: 11px; }
+  .attachment-picker__drag-hint { font-size: 11px; }
+  .attachment-picker .attachment-picker__limits { font-size: 10.5px; }
+  .attachment-camera { padding: 10px; }
+  .attachment-camera__dialog { max-height: calc(100dvh - 20px); }
+  .attachment-camera__header { padding: 14px; }
+  .attachment-camera__preview { margin: 12px 14px 0; }
+  .attachment-camera__footer { padding: 14px; }
+  .attachment-camera__button { flex-grow: 1; }
+}
+@media (prefers-reduced-motion: reduce) { .attachment-picker__spinner { animation-duration: 2.5s; } .attachment-picker__zone, .attachment-picker__tile { transition: none; } }

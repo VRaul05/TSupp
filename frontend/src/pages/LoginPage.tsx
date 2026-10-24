@@ -291,6 +291,7 @@ export function LoginPage() {
             </p>
 
             {form}
+        <p className="portal-switch"><a href="/soporte/acceso">Consola de soporte (demostración)</a></p>
             <div className="login-web__submit">{submitButton}</div>
             {ssoBlock}
 
@@ -346,6 +347,7 @@ export function LoginPage() {
         </section>
 
         {form}
+        <p className="portal-switch"><a href="/soporte/acceso">Consola de soporte (demostración)</a></p>
 
         {isLocked ? (
           <p className="login__hint">

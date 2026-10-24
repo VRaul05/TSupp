@@ -575,3 +575,5 @@
 .login-web__footer a:hover {
   text-decoration: underline;
 }
+
+.portal-switch { margin: 16px 0; text-align: center; font-size: 14px; }
