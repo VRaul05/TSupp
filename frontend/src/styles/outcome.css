@@ -1,0 +1,163 @@
+/*
+ * Estilos compartidos por las pantallas de resultado:
+ * "Sin sugerencia confiable", "¡Qué bueno que se resolvió!" y "Tu ticket fue creado".
+ */
+.outcome {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  text-align: center;
+  background:
+    radial-gradient(circle at 50% 120px, rgb(244 143 53 / 0.12), transparent 160px),
+    var(--surface-card);
+}
+
+.outcome__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border: 1px solid var(--color-primary-soft);
+  border-radius: var(--radius-full);
+  background: var(--surface-tint);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--color-neutral);
+}
+
+.outcome__chip svg {
+  color: var(--color-primary-strong);
+}
+
+.outcome__chips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+}
+
+/* Ilustración circular (reemplaza las imágenes rotas del diseño) */
+.outcome__art {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 112px;
+  height: 112px;
+  margin: var(--space-2) 0;
+  border-radius: 50%;
+  animation: pop 0.35s ease-out;
+}
+
+.outcome__art--neutral {
+  background: var(--color-primary-soft);
+  color: var(--color-primary-strong);
+}
+
+.outcome__art--success {
+  background: #e3f5ea;
+  color: var(--color-success);
+  box-shadow: 0 0 0 12px rgb(46 158 91 / 0.08);
+}
+
+.outcome__art--ticket {
+  background: var(--color-tertiary-soft);
+  color: var(--color-tertiary);
+  box-shadow: 0 0 0 12px rgb(201 22 111 / 0.06);
+}
+
+.outcome__art-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 3px solid var(--surface-card);
+  background: var(--color-tertiary);
+  font-weight: 800;
+  color: #fff;
+}
+
+@keyframes pop {
+  from { transform: scale(0.6); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+.outcome__title {
+  margin: 0;
+  font-size: var(--text-xl);
+  font-weight: 800;
+  line-height: 1.25;
+  color: var(--color-neutral);
+}
+
+.outcome__text {
+  max-width: 320px;
+  margin: calc(var(--space-2) * -1) 0 0;
+  font-size: var(--text-sm);
+  line-height: 1.5;
+}
+
+.outcome__info {
+  display: flex;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-4);
+  border: 1px solid var(--color-neutral-100);
+  border-radius: var(--radius-lg);
+  background: var(--surface-card);
+  text-align: left;
+  box-shadow: 0 1px 2px rgb(59 18 0 / 0.05);
+}
+
+.outcome__info-icon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  background: var(--color-primary-soft);
+  color: var(--color-primary-strong);
+}
+
+.outcome__info strong {
+  font-size: var(--text-sm);
+  color: var(--color-neutral);
+}
+
+.outcome__info p {
+  margin: 4px 0 0;
+  font-size: var(--text-xs);
+  line-height: 1.5;
+}
+
+.outcome__footer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.outcome__note {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin: 0;
+  font-size: var(--text-xs);
+  color: var(--color-neutral-500);
+}
+
+.outcome__link {
+  align-self: center;
+  padding: var(--space-2);
+  border: none;
+  background: none;
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--color-tertiary);
+  cursor: pointer;
+}

@@ -1,0 +1,187 @@
+.privacy {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.privacy__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.privacy__title {
+  margin: 0 0 var(--space-2);
+  font-size: var(--text-xl);
+  font-weight: 800;
+  color: var(--color-neutral);
+}
+
+.privacy__intro {
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: 1.5;
+}
+
+/* ---------- Caja con el texto del aviso ---------- */
+.privacy__box {
+  border: 1px solid var(--color-primary-soft);
+  border-radius: var(--radius-md);
+  background: var(--surface-card);
+  overflow: hidden;
+}
+
+.privacy__box-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background: var(--surface-tint);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--color-neutral-700);
+}
+
+.privacy__box-head > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.privacy__box-head svg {
+  color: var(--color-primary-strong);
+}
+
+.privacy__scroll-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: none;
+  background: none;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--color-primary-strong);
+  cursor: pointer;
+}
+
+.privacy__progress {
+  height: 3px;
+  background: var(--color-neutral-100);
+}
+
+.privacy__progress span {
+  display: block;
+  height: 100%;
+  background: var(--color-primary);
+  transform-origin: left;
+  transition: transform 0.1s linear;
+}
+
+.privacy__text {
+  max-height: min(48dvh, 380px);
+  overflow-y: auto;
+  padding: var(--space-4);
+  font-size: var(--text-sm);
+  line-height: 1.55;
+  overscroll-behavior: contain;
+}
+
+.privacy__text h3 {
+  margin: 0 0 var(--space-1);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--color-neutral);
+}
+
+.privacy__text p {
+  margin: 0 0 var(--space-4);
+}
+
+.privacy__end {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin: 0 !important;
+  padding: var(--space-2);
+  border-radius: var(--radius-sm);
+  background: var(--surface-tint);
+  font-size: var(--text-xs);
+  color: var(--color-neutral-500);
+}
+
+/* ---------- Casilla "He leído..." ---------- */
+.privacy__check {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-neutral);
+  cursor: pointer;
+}
+
+.privacy__check small {
+  display: block;
+  margin-top: 2px;
+  font-weight: 400;
+  color: var(--color-neutral-500);
+}
+
+.privacy__box-mark {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--color-neutral-300);
+  border-radius: 6px;
+  background: var(--surface-card);
+  color: var(--color-on-primary);
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.privacy__check input:checked + .privacy__box-mark {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.privacy__check input:focus-visible + .privacy__box-mark {
+  box-shadow: var(--focus-ring);
+}
+
+.privacy__check--disabled {
+  cursor: not-allowed;
+}
+
+.privacy__check--disabled .privacy__box-mark {
+  background: var(--color-neutral-100);
+}
+
+/* ---------- Pie ---------- */
+.privacy__footer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.privacy__footer p {
+  margin: 0;
+  text-align: center;
+  font-size: var(--text-xs);
+  color: var(--color-neutral-500);
+}
+
+.privacy__accepted {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: #e3f5ea;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: #1d6b3d;
+}
