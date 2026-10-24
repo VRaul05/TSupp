@@ -1,0 +1,81 @@
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.field__label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.field__label {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-neutral);
+}
+
+.field__control {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 48px;
+  padding: 0 var(--space-3);
+  background: var(--color-neutral-100);
+  border: 1.5px solid transparent;
+  border-radius: var(--radius-md);
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.field__control:focus-within {
+  background: var(--surface-card);
+  border-color: var(--color-primary);
+}
+
+.field--error .field__control {
+  border-color: var(--color-error);
+  background: var(--color-error-soft);
+}
+
+.field__icon {
+  display: grid;
+  place-items: center;
+  color: var(--color-neutral-500);
+}
+
+.field__input {
+  flex: 1;
+  min-width: 0;
+  height: 46px;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: var(--text-md); /* 16px evita el zoom automático en iPhone */
+  color: var(--color-neutral);
+}
+
+.field__input::placeholder {
+  color: var(--color-neutral-500);
+}
+
+.field__input:disabled {
+  color: var(--color-neutral-500);
+}
+
+.field__toggle {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--color-neutral-500);
+  cursor: pointer;
+}
+
+.field__toggle:hover:not(:disabled) {
+  color: var(--color-neutral);
+}

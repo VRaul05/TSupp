@@ -1,0 +1,214 @@
+.resolved__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: calc(var(--space-2) * -1);
+  padding: 4px 12px;
+  border: 1px solid #b9e3c8;
+  border-radius: var(--radius-full);
+  background: #e3f5ea;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: #1d6b3d;
+}
+
+/* ---------- Calificación ---------- */
+.rating {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-5) var(--space-4);
+  border: 1px solid var(--color-neutral-100);
+  border-radius: var(--radius-lg);
+  background: var(--surface-card);
+  box-shadow: 0 1px 2px rgb(59 18 0 / 0.05);
+}
+
+.rating h3 {
+  margin: 0;
+  font-size: var(--text-md);
+  font-weight: 700;
+  color: var(--color-neutral);
+}
+
+.rating__caption {
+  margin: calc(var(--space-2) * -1) 0 0;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--color-tertiary);
+}
+
+.rating__stars {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-1);
+}
+
+.rating__star {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border: none;
+  border-radius: 50%;
+  background: none;
+  color: var(--color-neutral-300);
+  cursor: pointer;
+  transition: transform 0.1s ease, color 0.1s ease;
+}
+
+.rating__star:hover {
+  transform: scale(1.12);
+}
+
+.rating__star--on {
+  color: var(--color-primary);
+}
+
+.rating__star--on svg {
+  fill: currentColor;
+}
+
+.rating__comment {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  text-align: left;
+}
+
+.rating__comment-head {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--text-xs);
+}
+
+.rating__comment-head label {
+  font-weight: 700;
+  color: var(--color-neutral);
+}
+
+.rating__comment-head label span,
+.rating__comment-head > span {
+  font-weight: 400;
+  color: var(--color-neutral-500);
+}
+
+.rating__comment textarea {
+  width: 100%;
+  padding: var(--space-3);
+  border: 1.5px solid transparent;
+  border-radius: var(--radius-md);
+  background: var(--color-neutral-100);
+  font-size: var(--text-md);
+  line-height: 1.5;
+  resize: vertical;
+  outline: none;
+}
+
+.rating__comment textarea:focus {
+  border-color: var(--color-primary);
+  background: var(--surface-card);
+}
+
+.rating__aspects {
+  margin: 0;
+  padding: 0;
+  border: none;
+  text-align: left;
+}
+
+.rating__aspects legend {
+  margin-bottom: var(--space-2);
+  padding: 0;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--color-neutral);
+}
+
+.rating__aspects > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.rating__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 34px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--color-primary-soft);
+  border-radius: var(--radius-full);
+  background: var(--surface-tint);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--color-neutral);
+  cursor: pointer;
+}
+
+.rating__chip--on {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+.resolved__thanks {
+  width: 100%;
+  padding: var(--space-5);
+  border-radius: var(--radius-lg);
+  background: #e3f5ea;
+  color: #1d6b3d;
+  animation: pop 0.3s ease-out;
+}
+
+.resolved__thanks p {
+  margin: 4px 0 0;
+  font-size: var(--text-sm);
+}
+
+/* ---------- Nota de privacidad ---------- */
+.resolved__note {
+  display: flex;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-4);
+  border: 1px solid #f7c2d8;
+  border-radius: var(--radius-lg);
+  background: #fff1f6;
+  text-align: left;
+}
+
+.resolved__note > span {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--surface-card);
+  color: var(--color-tertiary);
+}
+
+.resolved__note strong {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--color-neutral);
+}
+
+.resolved__note em {
+  padding: 1px 8px;
+  border-radius: var(--radius-full);
+  background: #e3f5ea;
+  font-size: 11px;
+  font-style: normal;
+  color: #1d6b3d;
+}
+
+.resolved__note p {
+  margin: 4px 0 0;
+  font-size: var(--text-xs);
+  line-height: 1.5;
+}

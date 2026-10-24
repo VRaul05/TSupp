@@ -1,0 +1,324 @@
+.profile {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+/* ---------- Tarjeta de usuario ---------- */
+.profile-card {
+  padding: var(--space-4);
+  border: 1px solid var(--color-primary-soft);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(160deg, #fff4ec, var(--surface-card) 60%);
+  box-shadow: 0 1px 2px rgb(59 18 0 / 0.05);
+}
+
+.profile-card__top {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.profile-card__avatar {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 64px;
+  height: 64px;
+  border: 2px solid var(--color-primary);
+  border-radius: 50%;
+  background: var(--color-primary-soft);
+  font-size: var(--text-lg);
+  font-weight: 800;
+  color: var(--color-primary-strong);
+}
+
+.profile-card__info {
+  min-width: 0;
+}
+
+.profile-card__info h2 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  font-size: var(--text-lg);
+  font-weight: 800;
+  color: var(--color-neutral);
+}
+
+.profile-card__info h2 svg {
+  flex-shrink: 0;
+  color: var(--color-success);
+}
+
+.profile-card__info p {
+  margin: 2px 0 var(--space-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: var(--text-xs);
+  color: var(--color-neutral-700);
+}
+
+.profile-card__role {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 10px;
+  border: 1px solid var(--color-primary-soft);
+  border-radius: var(--radius-full);
+  background: var(--surface-tint);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-primary-strong);
+}
+
+.profile-card__stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+.profile-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--surface-tint);
+  text-align: center;
+  text-decoration: none;
+}
+
+.profile-stat strong {
+  font-size: var(--text-xl);
+  font-weight: 800;
+  color: var(--color-neutral);
+}
+
+.profile-stat span {
+  font-size: var(--text-xs);
+  color: var(--color-neutral-700);
+}
+
+.profile-stat__online {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--text-sm) !important;
+  line-height: 2.1;
+  color: #1d6b3d !important;
+}
+
+.profile-stat__online span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-success);
+}
+
+/* ---------- Secciones ---------- */
+.profile__section-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-2);
+  font-size: var(--text-sm);
+  font-weight: 800;
+  color: var(--color-neutral);
+}
+
+.profile__section-title svg {
+  color: var(--color-primary-strong);
+}
+
+.profile-group {
+  border: 1px solid var(--color-neutral-100);
+  border-radius: var(--radius-lg);
+  background: var(--surface-card);
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgb(59 18 0 / 0.05);
+}
+
+.profile-group > * + * {
+  border-top: 1px solid var(--color-neutral-100);
+}
+
+.profile-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-4);
+  border: none;
+  background: none;
+  text-align: left;
+  text-decoration: none;
+  color: var(--color-neutral-700);
+  cursor: pointer;
+}
+
+.profile-link:hover {
+  background: var(--surface-page);
+}
+
+.profile-link > span {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.profile-link strong {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--color-neutral);
+}
+
+.profile-link em {
+  padding: 1px 8px;
+  border-radius: var(--radius-full);
+  background: #e3f5ea;
+  font-size: 11px;
+  font-style: normal;
+  color: #1d6b3d;
+}
+
+.profile-link small {
+  font-size: var(--text-xs);
+  line-height: 1.5;
+}
+
+.profile__warning {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-warning-soft);
+  font-size: var(--text-xs);
+  color: var(--color-warning-text);
+}
+
+.profile__logout {
+  border-color: #f3b8b8 !important;
+  color: var(--color-error) !important;
+}
+
+.profile__footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding-bottom: var(--space-2);
+  font-size: var(--text-xs);
+  color: var(--color-neutral-500);
+}
+
+.profile__footer p {
+  margin: 0;
+}
+
+.profile__ai {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #1d6b3d;
+}
+
+.profile__ai span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--color-success);
+}
+
+.profile__reset {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: var(--space-2);
+  padding: var(--space-1) var(--space-2);
+  border: none;
+  background: none;
+  font-size: 11px;
+  color: var(--color-neutral-500);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* ---------- Derechos ARCO ---------- */
+.arco__options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+.arco__option {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--space-3);
+  border: 1.5px solid var(--color-neutral-100);
+  border-radius: var(--radius-md);
+  background: var(--surface-card);
+  text-align: left;
+  cursor: pointer;
+}
+
+.arco__option strong {
+  font-size: var(--text-sm);
+  color: var(--color-neutral);
+}
+
+.arco__option span {
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--color-neutral-700);
+}
+
+.arco__option--on {
+  border-color: var(--color-primary);
+  background: var(--surface-tint);
+}
+
+.arco__label {
+  display: block;
+  margin-bottom: var(--space-2);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--color-neutral);
+}
+
+.arco__hint {
+  margin: var(--space-1) 0 0;
+  font-size: 11px;
+  color: var(--color-neutral-500);
+}
+
+.arco__done {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-4) 0;
+  text-align: center;
+  color: var(--color-success);
+}
+
+.arco__done p {
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--color-neutral-700);
+}
+
+.arco__done strong {
+  color: var(--color-neutral);
+}
+
+.arco__full {
+  grid-column: 1 / -1;
+}

@@ -1,4 +1,4 @@
-# TSupp — Consola de soporte PUGSTIC
+# TSupp — Portal del empleado y consola de soporte
 
 Interfaces de `Pruebas_V3/consola-soporte-react` integradas en el frontend oficial.
 Se conservan React 19, TypeScript 6, Vite 8, los scripts y las configuraciones del
@@ -27,14 +27,14 @@ npm run preview
 
 | Ruta | Interfaz |
 | --- | --- |
-| `/acceso` | Selección de rol de demostración |
-| `/tickets` | Lista, búsqueda, filtros y ordenación |
-| `/registro` | Alta de ticket, formulario por subcategoría y adjuntos |
-| `/tickets/:id` | Contexto, Conversación, IA y Notas |
-| `/conocimiento` | Base técnica, búsqueda y filtros |
-| `/conocimiento/nuevo` | Creación de borrador de artículo |
-| `/conocimiento/:id` | Visor, edición, versiones y autorización de artículos |
-| `/alertas`, `/perfil` | Páginas pendientes en el prototipo original |
+| `/soporte/acceso` | Selección de rol de demostración |
+| `/soporte/tickets` | Lista, búsqueda, filtros y ordenación |
+| `/soporte/registro` | Alta de ticket, formulario por subcategoría y adjuntos |
+| `/soporte/tickets/:id` | Contexto, Conversación, IA y Notas |
+| `/soporte/conocimiento` | Base técnica, búsqueda y filtros |
+| `/soporte/conocimiento/nuevo` | Creación de borrador de artículo |
+| `/soporte/conocimiento/:id` | Visor, edición, versiones y autorización de artículos |
+| `/soporte/alertas`, `/soporte/perfil` | Páginas pendientes en el prototipo original |
 
 El detalle incluye las hojas **Solicitar información**, **Registrar solución** y
 **Escalar al supervisor**. Las interfaces se distribuyen entre rutas, pestañas y
@@ -78,3 +78,31 @@ El lock se actualiza desde el del destino. La rama es `chore/project-bootstrap`.
 
 No se copian `node_modules`, `.git`, `dist`, `.env` ni archivos de compilación del
 prototipo. Los estilos y recursos iniciales de Vite permanecen sin importarse.
+
+## Integración con main y resolución del PR #6
+
+Se conservan los dos portales en la rama `chore/project-bootstrap`:
+
+- **Empleado:** `/login`, `/inicio`, `/mis-tickets`, `/tickets/:id`,
+  `/nueva-solicitud`, `/notificaciones`, `/perfil` y demás rutas existentes de main.
+- **Soporte:** `/soporte/acceso`, `/soporte/tickets`, `/soporte/registro`,
+  `/soporte/conocimiento` y sus rutas de detalle.
+
+Hay enlaces entre ambos accesos. Cada portal carga su propio router y estilos;
+los enlaces entre portales recargan el documento para evitar mezclar estilos
+globales. El código de soporte se encuentra en `src/support/` y el del empleado
+conserva su estructura. Las sesiones y los datos locales de ambos prototipos
+siguen siendo independientes: esta resolución no integra sus servicios de datos.
+
+Se conserva React Router 7 y Lucide 1 de main, junto con las dependencias i18next
+de la consola. El lock se genera mediante npm sin ignorar conflictos de peers.
+Los cambios de backend/database de main se incorporan sin modificaciones manuales.
+
+### Comprobar ambos portales
+
+1. Abrir `/login` y comprobar el portal del empleado. La cuenta simulada de main
+   es `usuario.demo@institucion.mx` / `Demo1234`.
+2. Abrir el enlace «Consola de soporte (demostración)» y seleccionar un rol.
+3. Crear un ticket y comprobar que sus enlaces permanecen bajo `/soporte`.
+4. Recargar el detalle y volver al portal del empleado con el enlace del acceso.
+5. Ejecutar `npm run build` y `npm run lint` antes de subir la resolución.

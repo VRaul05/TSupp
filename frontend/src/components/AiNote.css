@@ -1,0 +1,30 @@
+.ai-note {
+  display: flex;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid #f7c2d8;
+  border-radius: var(--radius-md);
+  background: #fff1f6;
+  font-size: var(--text-xs);
+  line-height: 1.5;
+  color: var(--color-neutral-700);
+}
+
+.ai-note__icon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--color-tertiary-soft);
+  color: var(--color-tertiary);
+}
+
+.ai-note strong {
+  color: var(--color-tertiary);
+}
+
+.ai-note p {
+  margin: 0;
+}

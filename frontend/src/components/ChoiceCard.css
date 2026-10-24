@@ -1,0 +1,99 @@
+.choice {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1.5px solid var(--color-neutral-100);
+  border-radius: var(--radius-lg);
+  background: var(--surface-card);
+  box-shadow: 0 1px 2px rgb(59 18 0 / 0.04);
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.choice:hover {
+  border-color: var(--color-primary-soft);
+}
+
+.choice--checked {
+  border-color: var(--color-primary);
+  background: #fffaf6;
+}
+
+.choice:has(input:focus-visible) {
+  box-shadow: var(--focus-ring);
+}
+
+.choice--compact {
+  align-items: center;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+}
+
+.choice__icon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  background: var(--color-primary-soft);
+  color: var(--color-primary-strong);
+}
+
+.choice--muted .choice__icon {
+  width: 36px;
+  height: 36px;
+  background: var(--color-neutral-100);
+  color: var(--color-neutral-700);
+}
+
+.choice__text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.choice__title {
+  font-size: var(--text-md);
+  font-weight: 700;
+  color: var(--color-neutral);
+}
+
+.choice--compact .choice__title,
+.choice--muted .choice__title {
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.choice__desc {
+  font-size: var(--text-xs);
+  line-height: 1.5;
+  color: var(--color-neutral-700);
+}
+
+.choice--muted .choice__desc {
+  color: var(--color-tertiary);
+}
+
+/* Círculo del radio. En las opciones compactas va a la izquierda. */
+.choice__radio {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  margin-top: 2px;
+  border: 2px solid var(--color-neutral-300);
+  border-radius: 50%;
+  transition: border 0.15s ease;
+}
+
+.choice--compact .choice__radio {
+  order: -1;
+  margin-top: 0;
+}
+
+.choice--checked .choice__radio {
+  border: 6px solid var(--color-primary);
+}
