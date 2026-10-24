@@ -1,0 +1,104 @@
+@import "./tokens.css";
+@import "./outcome.css";
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-family);
+  font-size: var(--text-md);
+  color: var(--color-neutral-700);
+  background: var(--surface-page);
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+a {
+  color: var(--color-tertiary);
+}
+
+:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+/* ------------------------------------------------------------
+ * Layout de pantalla (mobile-first)
+ * En celular ocupa toda la pantalla; desde 600px se muestra
+ * como una tarjeta centrada para que se vea bien en la web.
+ * ------------------------------------------------------------ */
+.screen {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  background: var(--surface-card);
+}
+
+.screen__content {
+  flex: 1;
+  padding: var(--space-6) var(--space-5);
+}
+
+.screen__footer {
+  position: sticky;
+  bottom: 0;
+  padding: var(--space-4) var(--space-5) var(--space-5);
+  background: var(--surface-card);
+  border-top: 1px solid var(--color-neutral-100);
+}
+
+@media (min-width: 600px) {
+  body {
+    background:
+      radial-gradient(circle at 15% 10%, var(--color-primary-soft), transparent 45%),
+      radial-gradient(circle at 85% 90%, var(--color-tertiary-soft), transparent 45%),
+      var(--surface-page);
+  }
+
+  .screen {
+    max-width: 440px;
+    min-height: auto;
+    margin: var(--space-8) auto;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+  }
+
+  .screen__content {
+    padding: var(--space-8) var(--space-8) var(--space-6);
+  }
+
+  .screen__footer {
+    position: static;
+    padding: var(--space-4) var(--space-8) var(--space-6);
+  }
+}
+
+/* Utilidad para lectores de pantalla */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
