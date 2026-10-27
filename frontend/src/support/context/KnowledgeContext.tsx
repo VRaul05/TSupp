@@ -20,21 +20,43 @@ import {
 
 import {
   getPublicKnowledge,
+  getAllKnowledge,
+  createKnowledge,
+  updateKnowledge,
+  submitKnowledge,
+  authorizeKnowledge,
+  revokeKnowledge,
+  serializeKnowledgeContent,
   adaptKnowledgeArticle,
 } from '../services/knowledgeApi';
+
+import { getSupportToken } from '../services/supportAuth';
+
 
 type KnowledgeContextType = {
   articles: KnowledgeArticle[];
   loading: boolean;
   error: string | null;
+
   saveDraft: (article: KnowledgeArticle, note: string) => void;
   createDraft: (article: KnowledgeArticle) => void;
+
+  // Funciones conectadas a PostgreSQL
+  createDraftRemote: (article: KnowledgeArticle) => Promise<KnowledgeArticle>;
+  saveDraftRemote: (article: KnowledgeArticle, note: string) => Promise<KnowledgeArticle>;
+
+  submitDraftRemote: (id: string) => Promise<KnowledgeArticle>;
+  authorizeDraftRemote: (id: string) => Promise<KnowledgeArticle>;
+  revokeDraftRemote: (id: string) => Promise<KnowledgeArticle>;
+
   setAuthorization: (
     id: string,
     status: 'Autorizado' | 'Revocado'
   ) => void;
+
   resetKnowledge: () => void;
 };
+
 
 const Context = createContext<KnowledgeContextType | null>(null);
 
@@ -63,7 +85,7 @@ export function KnowledgeProvider({
   const [localArticles, setLocalArticles] =
     useState<KnowledgeArticle[]>(load);
 
-  // Artículos autorizados provenientes de PostgreSQL
+  // Artículos provenientes de PostgreSQL
   const [remoteArticles, setRemoteArticles] =
     useState<KnowledgeArticle[]>([]);
 
@@ -80,7 +102,9 @@ export function KnowledgeProvider({
       setError(null);
 
       try {
-        const response = await getPublicKnowledge();
+        const response = getSupportToken()
+          ? await getAllKnowledge()
+          : await getPublicKnowledge();
 
         if (!active) return;
 
@@ -89,7 +113,7 @@ export function KnowledgeProvider({
         setRemoteArticles(adapted);
 
         console.log(
-          'Artículos autorizados cargados desde PostgreSQL:',
+          'Artículos cargados desde PostgreSQL:',
           adapted.length
         );
       } catch (err) {
@@ -132,12 +156,101 @@ export function KnowledgeProvider({
     return [...remoteArticles, ...uniqueLocal];
   }, [remoteArticles, localArticles]);
 
-  // Crear borrador local
+
+  // Crear un borrador real en PostgreSQL
+  const createDraftRemote = async (
+    article: KnowledgeArticle
+  ): Promise<KnowledgeArticle> => {
+    const created = await createKnowledge({
+      title: article.title.trim(),
+      category: article.category,
+      content: serializeKnowledgeContent(article.versions[0]),
+      note: article.versions[0].note || 'Creación del borrador',
+    });
+
+    const adapted = adaptKnowledgeArticle(created);
+
+    setRemoteArticles(previous => [
+      adapted,
+      ...previous.filter(a => a.id !== adapted.id),
+    ]);
+
+    return adapted;
+  };
+
+  // Editar artículo y crear una nueva versión en PostgreSQL
+  const saveDraftRemote = async (
+    article: KnowledgeArticle,
+    note: string
+  ): Promise<KnowledgeArticle> => {
+    const updated = await updateKnowledge(article.id, {
+      title: article.title.trim(),
+      content: serializeKnowledgeContent(article.versions[0]),
+      note: note.trim() || 'Actualización del borrador',
+    });
+
+    const adapted = adaptKnowledgeArticle(updated);
+
+    setRemoteArticles(previous => [
+      adapted,
+      ...previous.filter(a => a.id !== adapted.id),
+    ]);
+
+    return adapted;
+  };
+
+  // Enviar un borrador a revisión
+  const submitDraftRemote = async (
+    id: string
+  ): Promise<KnowledgeArticle> => {
+    const response = await submitKnowledge(id);
+    const adapted = adaptKnowledgeArticle(response);
+
+    setRemoteArticles(previous => [
+      adapted,
+      ...previous.filter(a => a.id !== adapted.id),
+    ]);
+
+    return adapted;
+  };
+
+  // Autorizar un documento (solo supervisor)
+  const authorizeDraftRemote = async (
+    id: string
+  ): Promise<KnowledgeArticle> => {
+    const response = await authorizeKnowledge(id);
+    const adapted = adaptKnowledgeArticle(response);
+
+    setRemoteArticles(previous => [
+      adapted,
+      ...previous.filter(a => a.id !== adapted.id),
+    ]);
+
+    return adapted;
+  };
+
+  // Revocar un documento (solo supervisor)
+  const revokeDraftRemote = async (
+    id: string
+  ): Promise<KnowledgeArticle> => {
+    const response = await revokeKnowledge(id);
+    const adapted = adaptKnowledgeArticle(response);
+
+    setRemoteArticles(previous => [
+      adapted,
+      ...previous.filter(a => a.id !== adapted.id),
+    ]);
+
+    return adapted;
+  };
+
+
+  // Crear borrador local (compatibilidad temporal)
   const createDraft = (article: KnowledgeArticle) => {
     setLocalArticles(previous => [article, ...previous]);
   };
 
-  // Editar borrador local
+  // Editar borrador local (compatibilidad temporal)
   const saveDraft = (
     article: KnowledgeArticle,
     note: string
@@ -210,7 +323,7 @@ export function KnowledgeProvider({
     );
   };
 
-  // Reiniciar borradores y actualizar API
+  // Reiniciar borradores locales y actualizar API
   const resetKnowledge = () => {
     setLocalArticles(load());
     setRefreshKey(previous => previous + 1);
@@ -224,6 +337,11 @@ export function KnowledgeProvider({
         error,
         saveDraft,
         createDraft,
+        createDraftRemote,
+        saveDraftRemote,
+        submitDraftRemote,
+        authorizeDraftRemote,
+        revokeDraftRemote,
         setAuthorization,
         resetKnowledge,
       }}

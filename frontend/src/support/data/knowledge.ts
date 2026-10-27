@@ -1,6 +1,6 @@
 import type { TicketFile } from './tickets';
 
-export type KnowledgeStatus = 'Autorizado' | 'Borrador' | 'Revocado';
+export type KnowledgeStatus = 'Borrador' | 'En revisión' | 'Autorizado' | 'Revocado';
 export type KnowledgeCategory = 'Climatización' | 'Redes y Conectividad' | 'Seguridad y Accesos' | 'Audiovisual y Salas';
 export type KnowledgeVersion = { version: string; date: string; author: string; note: string; summary: string; requirements: string[]; steps: string[]; command?: string };
 export type KnowledgeAttachment = TicketFile & { url?: string };
