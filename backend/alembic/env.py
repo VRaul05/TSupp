@@ -4,7 +4,7 @@ from logging.config import fileConfig
 from alembic import context
 
 from app.core.database import Base, engine
-from app.models import user  # noqa: F401
+from app.models import user, knowledge  # noqa: F401
 from app.core.config import settings
 
 

@@ -4,7 +4,7 @@ from sqlalchemy import text
 
 from app.core.config import settings
 from app.core.database import engine
-
+from app.routers.knowledge import router as knowledge_router
 
 app = FastAPI(
     title="TSupp API",
@@ -14,11 +14,17 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[settings.frontend_origin],
+    allow_origins=[
+        settings.frontend_origin,
+        "http://localhost:5174",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Knowledge Base API
+app.include_router(knowledge_router)
 
 
 @app.get("/health")
