@@ -26,8 +26,14 @@ import {
   submitKnowledge,
   authorizeKnowledge,
   revokeKnowledge,
+  getKnowledgeVersions,
+  restoreKnowledge,
   serializeKnowledgeContent,
   adaptKnowledgeArticle,
+} from '../services/knowledgeApi';
+
+import type {
+  ApiKnowledgeVersion,
 } from '../services/knowledgeApi';
 
 import { getSupportToken } from '../services/supportAuth';
@@ -48,6 +54,10 @@ type KnowledgeContextType = {
   submitDraftRemote: (id: string) => Promise<KnowledgeArticle>;
   authorizeDraftRemote: (id: string) => Promise<KnowledgeArticle>;
   revokeDraftRemote: (id: string) => Promise<KnowledgeArticle>;
+
+  // Historial y restauración de versiones
+  getVersionsRemote: (id: string) => Promise<ApiKnowledgeVersion[]>;
+  restoreVersionRemote: (id: string, version: number) => Promise<KnowledgeArticle>;
 
   setAuthorization: (
     id: string,
@@ -244,6 +254,29 @@ export function KnowledgeProvider({
     return adapted;
   };
 
+  // Consultar historial de versiones desde PostgreSQL
+  const getVersionsRemote = async (
+    id: string
+  ): Promise<ApiKnowledgeVersion[]> => {
+    return await getKnowledgeVersions(id);
+  };
+
+  // Restaurar una versión anterior (solo supervisor)
+  const restoreVersionRemote = async (
+    id: string,
+    version: number
+  ): Promise<KnowledgeArticle> => {
+    const response = await restoreKnowledge(id, version);
+    const adapted = adaptKnowledgeArticle(response);
+
+    setRemoteArticles(previous => [
+      adapted,
+      ...previous.filter(a => a.id !== adapted.id),
+    ]);
+
+    return adapted;
+  };
+
 
   // Crear borrador local (compatibilidad temporal)
   const createDraft = (article: KnowledgeArticle) => {
@@ -342,6 +375,8 @@ export function KnowledgeProvider({
         submitDraftRemote,
         authorizeDraftRemote,
         revokeDraftRemote,
+        getVersionsRemote,
+        restoreVersionRemote,
         setAuthorization,
         resetKnowledge,
       }}
