@@ -1,24 +1,32 @@
-"""MVP knowledge API. Dev-only X-KB-Admin-Key protects writes; replace with RBAC/JWT before deployment."""
+
+"""Knowledge Base API protegida con JWT y permisos por rol."""
+
 from datetime import datetime
-from secrets import compare_digest
 from uuid import UUID
-from fastapi import APIRouter, Depends, Header, HTTPException, status
+
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import select
 from sqlalchemy.orm import Session
-from app.core.database import SessionLocal
-from app.core.config import settings
+
+from app.core.dependencies import (
+    get_db,
+    require_agent,
+    require_supervisor,
+)
 from app.models.knowledge import KnowledgeArticle, KnowledgeVersion
+from app.models.user import User
 
-router = APIRouter(prefix="/api/knowledge", tags=["knowledge"])
 
-def db_session():
-    with SessionLocal() as session:
-        yield session
+router = APIRouter(
+    prefix="/api/knowledge",
+    tags=["knowledge"],
+)
 
-def admin(x_kb_admin_key: str | None = Header(default=None)):
-    if not settings.kb_admin_key or not x_kb_admin_key or not compare_digest(x_kb_admin_key, settings.kb_admin_key):
-        raise HTTPException(status_code=403, detail="Administrative key required")
+
+# =============================
+# Esquemas
+# =============================
 
 class ArticleInput(BaseModel):
     title: str = Field(min_length=1, max_length=250)
@@ -26,17 +34,21 @@ class ArticleInput(BaseModel):
     content: str = Field(min_length=1)
     note: str = Field(default="", max_length=500)
 
+
 class EditInput(BaseModel):
     content: str = Field(min_length=1)
     note: str = Field(default="", max_length=500)
     title: str | None = Field(default=None, min_length=1, max_length=250)
 
+
 class VersionOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
+
     number: int
     content: str
     note: str
     created_at: datetime
+
 
 class ArticleOut(BaseModel):
     id: UUID
@@ -47,90 +59,339 @@ class ArticleOut(BaseModel):
     authorized_version: int | None
     content: str
 
-def get_article(db: Session, id: UUID) -> KnowledgeArticle:
-    a = db.get(KnowledgeArticle, id)
-    if a is None:
-        raise HTTPException(status_code=404, detail="Article not found")
-    return a
 
-def serial(db: Session, a: KnowledgeArticle, public: bool = False) -> ArticleOut:
-    number = a.authorized_version if public else a.current_version
-    v = db.scalar(select(KnowledgeVersion).where(KnowledgeVersion.article_id == a.id, KnowledgeVersion.number == number))
-    if not v:
-        raise HTTPException(status_code=404, detail="Version not found")
-    return ArticleOut(id=a.id,title=a.title,category=a.category,status=a.status,current_version=a.current_version,authorized_version=a.authorized_version,content=v.content)
+# =============================
+# Funciones auxiliares
+# =============================
+
+def get_article(db: Session, id: UUID) -> KnowledgeArticle:
+    article = db.get(KnowledgeArticle, id)
+
+    if article is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Article not found",
+        )
+
+    return article
+
+
+def serial(
+    db: Session,
+    article: KnowledgeArticle,
+    public: bool = False,
+) -> ArticleOut:
+    number = (
+        article.authorized_version
+        if public
+        else article.current_version
+    )
+
+    version = db.scalar(
+        select(KnowledgeVersion).where(
+            KnowledgeVersion.article_id == article.id,
+            KnowledgeVersion.number == number,
+        )
+    )
+
+    if version is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Version not found",
+        )
+
+    return ArticleOut(
+        id=article.id,
+        title=article.title,
+        category=article.category,
+        status=article.status,
+        current_version=article.current_version,
+        authorized_version=article.authorized_version,
+        content=version.content,
+    )
+
+
+# =============================
+# Endpoints públicos
+# =============================
 
 @router.get("/public", response_model=list[ArticleOut])
-def public_search(q: str = "", db: Session = Depends(db_session)):
-    stmt = select(KnowledgeArticle).where(KnowledgeArticle.status == "authorized", KnowledgeArticle.authorized_version.is_not(None))
-    if q:
-        stmt = stmt.where(KnowledgeArticle.title.ilike(f"%{q}%"))
-    return [serial(db,a,public=True) for a in db.scalars(stmt).all()]
+def public_search(
+    q: str = "",
+    db: Session = Depends(get_db),
+):
+    stmt = select(KnowledgeArticle).where(
+        KnowledgeArticle.status == "authorized",
+        KnowledgeArticle.authorized_version.is_not(None),
+    )
 
-@router.get("/public/{id}",response_model=ArticleOut)
-def public_article(id: UUID,db: Session = Depends(db_session)):
-    a=get_article(db,id)
-    if a.status != "authorized" or a.authorized_version is None:
-        raise HTTPException(status_code=404, detail="Article not found")
-    return serial(db,a,public=True)
+    if q.strip():
+        stmt = stmt.where(
+            KnowledgeArticle.title.ilike(f"%{q.strip()}%")
+        )
 
-@router.get("",response_model=list[ArticleOut],dependencies=[Depends(admin)])
-def list_all(db:Session=Depends(db_session)):
-    return [serial(db,a) for a in db.scalars(select(KnowledgeArticle)).all()]
+    articles = db.scalars(stmt).all()
 
-@router.post("",response_model=ArticleOut,status_code=201,dependencies=[Depends(admin)])
-def create(data:ArticleInput,db:Session=Depends(db_session)):
-    a=KnowledgeArticle(title=data.title,category=data.category,status="draft",current_version=1)
-    db.add(a); db.flush()
-    db.add(KnowledgeVersion(article_id=a.id,number=1,content=data.content,note=data.note))
-    db.commit();return serial(db,a)
+    return [
+        serial(db, article, public=True)
+        for article in articles
+    ]
 
-@router.get("/{id}",response_model=ArticleOut,dependencies=[Depends(admin)])
-def detail(id:UUID,db:Session=Depends(db_session)):
-    return serial(db,get_article(db,id))
 
-@router.put("/{id}",response_model=ArticleOut,dependencies=[Depends(admin)])
-def edit(id:UUID,data:EditInput,db:Session=Depends(db_session)):
-    a=get_article(db,id)
-    if data.title is not None:a.title=data.title
-    a.current_version+=1
-    # A content edit always unpublishes the article pending reapproval.
-    a.status="draft";a.authorized_version=None
-    db.add(KnowledgeVersion(article_id=a.id,number=a.current_version,content=data.content,note=data.note))
-    db.commit();return serial(db,a)
+@router.get("/public/{id}", response_model=ArticleOut)
+def public_article(
+    id: UUID,
+    db: Session = Depends(get_db),
+):
+    article = get_article(db, id)
 
-@router.get("/{id}/versions",response_model=list[VersionOut],dependencies=[Depends(admin)])
-def versions(id:UUID,db:Session=Depends(db_session)):
-    get_article(db,id)
-    return db.scalars(select(KnowledgeVersion).where(KnowledgeVersion.article_id==id).order_by(KnowledgeVersion.number.desc())).all()
+    if (
+        article.status != "authorized"
+        or article.authorized_version is None
+    ):
+        raise HTTPException(
+            status_code=404,
+            detail="Article not found",
+        )
 
-@router.post("/{id}/restore/{version}",response_model=ArticleOut,dependencies=[Depends(admin)])
-def restore(id:UUID,version:int,db:Session=Depends(db_session)):
-    a=get_article(db,id)
-    old=db.scalar(select(KnowledgeVersion).where(KnowledgeVersion.article_id==id,KnowledgeVersion.number==version))
-    if not old:raise HTTPException(status_code=404,detail="Version not found")
-    a.current_version+=1;a.status="draft";a.authorized_version=None
-    db.add(KnowledgeVersion(article_id=id,number=a.current_version,content=old.content,note=f"Restored from version {version}"))
-    db.commit();return serial(db,a)
+    return serial(db, article, public=True)
 
-@router.post("/{id}/submit",response_model=ArticleOut,dependencies=[Depends(admin)])
-def submit(id:UUID,db:Session=Depends(db_session)):
-    a=get_article(db,id)
-    if a.status!="draft":raise HTTPException(status_code=409,detail="Only drafts can be submitted")
-    a.status="under_review";db.commit();return serial(db,a)
 
-@router.post("/{id}/authorize",response_model=ArticleOut,dependencies=[Depends(admin)])
-def authorize(id:UUID,db:Session=Depends(db_session)):
-    a=get_article(db,id)
-    if a.status!="under_review":raise HTTPException(status_code=409,detail="Submit article for review first")
-    a.status="authorized";a.authorized_version=a.current_version;db.commit();return serial(db,a)
+# =============================
+# Consultas internas
+# =============================
 
-@router.post("/{id}/revoke",response_model=ArticleOut,dependencies=[Depends(admin)])
-def revoke(id:UUID,db:Session=Depends(db_session)):
-    a=get_article(db,id)
-    if a.status!="authorized":raise HTTPException(status_code=409,detail="Only authorized articles may be revoked")
-    a.status="revoked";a.authorized_version=None;db.commit();return serial(db,a)
+@router.get("", response_model=list[ArticleOut])
+def list_all(
+    db: Session = Depends(get_db),
+    user: User = Depends(require_agent),
+):
+    articles = db.scalars(
+        select(KnowledgeArticle)
+    ).all()
 
-@router.delete("/{id}",status_code=204,dependencies=[Depends(admin)])
-def delete(id:UUID,db:Session=Depends(db_session)):
-    db.delete(get_article(db,id));db.commit()
+    return [serial(db, article) for article in articles]
+
+
+@router.get("/{id}", response_model=ArticleOut)
+def detail(
+    id: UUID,
+    db: Session = Depends(get_db),
+    user: User = Depends(require_agent),
+):
+    return serial(db, get_article(db, id))
+
+
+# =============================
+# Crear y editar documentos
+# =============================
+
+@router.post("", response_model=ArticleOut, status_code=201)
+def create(
+    data: ArticleInput,
+    db: Session = Depends(get_db),
+    user: User = Depends(require_agent),
+):
+    article = KnowledgeArticle(
+        title=data.title,
+        category=data.category,
+        status="draft",
+        current_version=1,
+    )
+
+    db.add(article)
+    db.flush()
+
+    version = KnowledgeVersion(
+        article_id=article.id,
+        number=1,
+        content=data.content,
+        note=data.note,
+    )
+
+    db.add(version)
+    db.commit()
+
+    return serial(db, article)
+
+
+@router.put("/{id}", response_model=ArticleOut)
+def edit(
+    id: UUID,
+    data: EditInput,
+    db: Session = Depends(get_db),
+    user: User = Depends(require_agent),
+):
+    article = get_article(db, id)
+
+    if data.title is not None:
+        article.title = data.title
+
+    article.current_version += 1
+
+    # Toda edición requiere una nueva autorización.
+    article.status = "draft"
+    article.authorized_version = None
+
+    db.add(
+        KnowledgeVersion(
+            article_id=article.id,
+            number=article.current_version,
+            content=data.content,
+            note=data.note,
+        )
+    )
+
+    db.commit()
+
+    return serial(db, article)
+
+
+# =============================
+# Historial de versiones
+# =============================
+
+@router.get(
+    "/{id}/versions",
+    response_model=list[VersionOut],
+)
+def versions(
+    id: UUID,
+    db: Session = Depends(get_db),
+    user: User = Depends(require_agent),
+):
+    get_article(db, id)
+
+    return db.scalars(
+        select(KnowledgeVersion)
+        .where(KnowledgeVersion.article_id == id)
+        .order_by(KnowledgeVersion.number.desc())
+    ).all()
+
+
+@router.post(
+    "/{id}/restore/{version}",
+    response_model=ArticleOut,
+)
+def restore(
+    id: UUID,
+    version: int,
+    db: Session = Depends(get_db),
+    user: User = Depends(require_supervisor),
+):
+    article = get_article(db, id)
+
+    old_version = db.scalar(
+        select(KnowledgeVersion).where(
+            KnowledgeVersion.article_id == id,
+            KnowledgeVersion.number == version,
+        )
+    )
+
+    if old_version is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Version not found",
+        )
+
+    article.current_version += 1
+    article.status = "draft"
+    article.authorized_version = None
+
+    db.add(
+        KnowledgeVersion(
+            article_id=id,
+            number=article.current_version,
+            content=old_version.content,
+            note=f"Restored from version {version}",
+        )
+    )
+
+    db.commit()
+
+    return serial(db, article)
+
+
+# =============================
+# Ciclo documental
+# =============================
+
+@router.post("/{id}/submit", response_model=ArticleOut)
+def submit(
+    id: UUID,
+    db: Session = Depends(get_db),
+    user: User = Depends(require_agent),
+):
+    article = get_article(db, id)
+
+    if article.status != "draft":
+        raise HTTPException(
+            status_code=409,
+            detail="Only drafts can be submitted",
+        )
+
+    article.status = "under_review"
+
+    db.commit()
+
+    return serial(db, article)
+
+
+@router.post("/{id}/authorize", response_model=ArticleOut)
+def authorize(
+    id: UUID,
+    db: Session = Depends(get_db),
+    user: User = Depends(require_supervisor),
+):
+    article = get_article(db, id)
+
+    if article.status != "under_review":
+        raise HTTPException(
+            status_code=409,
+            detail="Submit article for review first",
+        )
+
+    article.status = "authorized"
+    article.authorized_version = article.current_version
+
+    db.commit()
+
+    return serial(db, article)
+
+
+@router.post("/{id}/revoke", response_model=ArticleOut)
+def revoke(
+    id: UUID,
+    db: Session = Depends(get_db),
+    user: User = Depends(require_supervisor),
+):
+    article = get_article(db, id)
+
+    if article.status != "authorized":
+        raise HTTPException(
+            status_code=409,
+            detail="Only authorized articles may be revoked",
+        )
+
+    article.status = "revoked"
+    article.authorized_version = None
+
+    db.commit()
+
+    return serial(db, article)
+
+
+# =============================
+# Eliminar documentos
+# =============================
+
+@router.delete("/{id}", status_code=204)
+def delete(
+    id: UUID,
+    db: Session = Depends(get_db),
+    user: User = Depends(require_supervisor),
+):
+    article = get_article(db, id)
+
+    db.delete(article)
+    db.commit()

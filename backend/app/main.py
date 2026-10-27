@@ -5,6 +5,7 @@ from sqlalchemy import text
 from app.core.config import settings
 from app.core.database import engine
 from app.routers.knowledge import router as knowledge_router
+from app.routers.auth import router as auth_router
 
 app = FastAPI(
     title="TSupp API",
@@ -25,6 +26,7 @@ app.add_middleware(
 
 # Knowledge Base API
 app.include_router(knowledge_router)
+app.include_router(auth_router)
 
 
 @app.get("/health")
