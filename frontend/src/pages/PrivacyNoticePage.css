@@ -185,3 +185,16 @@
   font-weight: 600;
   color: #1d6b3d;
 }
+
+/* Primer inicio en computadora: tarjeta más ancha y texto más alto. */
+@media (min-width: 1024px) {
+  .screen--wide {
+    max-width: 720px;
+  }
+
+  .screen--wide .privacy__text {
+    max-height: min(44dvh, 440px);
+    padding: var(--space-5) var(--space-6);
+    font-size: var(--text-md);
+  }
+}

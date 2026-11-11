@@ -5,6 +5,8 @@ import { Check, CircleCheckBig, Hash, Send, ShieldCheck, Star } from "lucide-rea
 import { AppHeader } from "../components/AppHeader";
 import { Button } from "../components/Button";
 import { getRequest, sendFeedback, type SupportRequest } from "../services/ticketService";
+import { useIsDesktop } from "../components/useMediaQuery";
+import { ResolvedWeb } from "./ResolvedWeb";
 import "./ResolvedPage.css";
 
 const RATING_LABELS = ["", "Nada útil", "Poco útil", "Útil", "Bastante útil", "Muy útil"];
@@ -15,6 +17,7 @@ const COMMENT_MAX = 200;
 export function ResolvedPage() {
   const { id = "" } = useParams();
   const navigate = useNavigate();
+  const isDesktop = useIsDesktop();
 
   const [request, setRequest] = useState<SupportRequest | null>(null);
   const [rating, setRating] = useState(0);
@@ -59,31 +62,7 @@ export function ResolvedPage() {
     setTimeout(() => navigate("/inicio", { replace: true }), 1400);
   }
 
-  return (
-    <div className="screen">
-      <AppHeader onBack={() => navigate("/inicio")} />
-
-      <main className="screen__content outcome resolved">
-        {request && (
-          <span className="outcome__chip">
-            <Hash size={13} /> Solicitud {request.id}
-          </span>
-        )}
-
-        <div className="outcome__art outcome__art--success" aria-hidden="true">
-          <CircleCheckBig size={52} />
-        </div>
-
-        <h2 className="outcome__title">¡Qué bueno que se resolvió!</h2>
-        <p className="outcome__text">
-          Tu solicitud se marcó como resuelta mediante autoservicio. No fue necesario crear un
-          ticket.
-        </p>
-        <span className="resolved__badge">
-          <Check size={13} strokeWidth={3} /> Resuelto
-        </span>
-
-        {sent ? (
+  const ratingBlock = sent ? (
           <section className="resolved__thanks" role="status">
             <strong>¡Gracias por tu calificación!</strong>
             <p>Nos ayuda a mejorar la atención para todos.</p>
@@ -159,7 +138,46 @@ export function ResolvedPage() {
               </div>
             </fieldset>
           </section>
+        );
+
+  if (isDesktop) {
+    return (
+      <ResolvedWeb
+        request={request}
+        ratingBlock={ratingBlock}
+        sent={sent}
+        rating={rating}
+        sending={sending}
+        onSend={handleSend}
+      />
+    );
+  }
+
+  return (
+    <div className="screen">
+      <AppHeader onBack={() => navigate("/inicio")} />
+
+      <main className="screen__content outcome resolved">
+        {request && (
+          <span className="outcome__chip">
+            <Hash size={13} /> Solicitud {request.id}
+          </span>
         )}
+
+        <div className="outcome__art outcome__art--success" aria-hidden="true">
+          <CircleCheckBig size={52} />
+        </div>
+
+        <h2 className="outcome__title">¡Qué bueno que se resolvió!</h2>
+        <p className="outcome__text">
+          Tu solicitud se marcó como resuelta mediante autoservicio. No fue necesario crear un
+          ticket.
+        </p>
+        <span className="resolved__badge">
+          <Check size={13} strokeWidth={3} /> Resuelto
+        </span>
+
+        {ratingBlock}
 
         <aside className="resolved__note">
           <span>

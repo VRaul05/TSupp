@@ -19,12 +19,15 @@ import {
 import { AppHeader } from "../components/AppHeader";
 import { Button } from "../components/Button";
 import { categoryLabel, getTicket, type Ticket } from "../services/ticketService";
+import { useIsDesktop } from "../components/useMediaQuery";
+import { TicketCreatedWeb } from "./TicketCreatedWeb";
 import "./TicketCreatedPage.css";
 
 /** FR-09: confirmación del ticket creado con todo el contexto consolidado. */
 export function TicketCreatedPage() {
   const { id = "" } = useParams();
   const navigate = useNavigate();
+  const isDesktop = useIsDesktop();
   const [ticket, setTicket] = useState<Ticket | null>(null);
   const [copied, setCopied] = useState(false);
 
@@ -47,6 +50,58 @@ export function TicketCreatedPage() {
 
   const attachments = ticket?.attachments.length ?? 0;
   const attempted = ticket?.attemptedSteps ?? 0;
+
+  const summaryRows = ticket ? (
+            <dl className="summary__rows">
+              <div>
+                <dt>
+                  {ticket.subcategory === "red" ? <Wifi size={15} /> : <Tag size={15} />} Categoría:
+                </dt>
+                <dd>
+                  <span className="summary__pill">
+                    {categoryLabel(ticket.category, ticket.subcategory)}
+                  </span>
+                </dd>
+              </div>
+              <div>
+                <dt>
+                  <Paperclip size={15} /> Evidencias:
+                </dt>
+                <dd>{attachments === 0 ? "Sin adjuntos" : `${attachments} adjunto${attachments > 1 ? "s" : ""}`}</dd>
+              </div>
+              <div>
+                <dt>
+                  <RefreshCw size={15} /> Autoservicio:
+                </dt>
+                <dd>
+                  {attempted === 0
+                    ? "Sin pasos probados"
+                    : `${attempted} sugerencia${attempted > 1 ? "s" : ""} probada${attempted > 1 ? "s" : ""}`}
+                </dd>
+              </div>
+              <div>
+                <dt>
+                  <Timer size={15} /> Respuesta estimada:
+                </dt>
+                <dd className="summary__estimate">
+                  {ticket.estimatedResponse ?? "Por definir"}
+                  <small>Tiempo estimado</small>
+                </dd>
+              </div>
+            </dl>
+          ) : null;
+
+  if (isDesktop) {
+    return (
+      <TicketCreatedWeb
+        id={id}
+        ticket={ticket}
+        summaryRows={summaryRows}
+        copied={copied}
+        onCopy={copyId}
+      />
+    );
+  }
 
   return (
     <div className="screen">
@@ -92,45 +147,7 @@ export function TicketCreatedPage() {
             </div>
           </header>
 
-          {ticket && (
-            <dl className="summary__rows">
-              <div>
-                <dt>
-                  {ticket.subcategory === "red" ? <Wifi size={15} /> : <Tag size={15} />} Categoría:
-                </dt>
-                <dd>
-                  <span className="summary__pill">
-                    {categoryLabel(ticket.category, ticket.subcategory)}
-                  </span>
-                </dd>
-              </div>
-              <div>
-                <dt>
-                  <Paperclip size={15} /> Evidencias:
-                </dt>
-                <dd>{attachments === 0 ? "Sin adjuntos" : `${attachments} adjunto${attachments > 1 ? "s" : ""}`}</dd>
-              </div>
-              <div>
-                <dt>
-                  <RefreshCw size={15} /> Autoservicio:
-                </dt>
-                <dd>
-                  {attempted === 0
-                    ? "Sin pasos probados"
-                    : `${attempted} sugerencia${attempted > 1 ? "s" : ""} probada${attempted > 1 ? "s" : ""}`}
-                </dd>
-              </div>
-              <div>
-                <dt>
-                  <Timer size={15} /> Respuesta estimada:
-                </dt>
-                <dd className="summary__estimate">
-                  {ticket.estimatedResponse ?? "Por definir"}
-                  <small>Tiempo estimado</small>
-                </dd>
-              </div>
-            </dl>
-          )}
+          {summaryRows}
         </section>
 
         <aside className="created__note">

@@ -1,0 +1,159 @@
+.tcw {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: var(--space-6);
+  align-items: start;
+}
+
+.tcw-hero {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  padding-bottom: var(--space-5);
+  border-bottom: 1px solid var(--color-neutral-100);
+}
+
+.tcw-hero__art {
+  flex-shrink: 0;
+  width: 96px;
+  height: 96px;
+  margin: 0 0 0 10px;
+}
+
+.tcw-hero h1 {
+  margin: 0 0 var(--space-2);
+  font-size: 1.875rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--color-neutral);
+}
+
+.tcw-hero__chips {
+  justify-content: flex-start;
+  align-items: center;
+  margin: 0;
+}
+
+.tcw-hero__chips .created__copied {
+  margin: 0;
+}
+
+.tcw-hero__title {
+  margin: var(--space-3) 0 0;
+  font-weight: 600;
+  color: var(--color-neutral-700);
+}
+
+.tcw-summary {
+  margin: var(--space-5) 0 0;
+}
+
+.tcw-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--color-neutral-100);
+}
+
+/* ---------- Lateral ---------- */
+.tcw-side {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.tcw-side .web-card {
+  padding: var(--space-5);
+}
+
+.tcw-side .created__note {
+  margin: 0;
+}
+
+.tcw-side__title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 var(--space-4);
+  font-size: var(--text-md);
+  font-weight: 800;
+  color: var(--color-neutral);
+}
+
+.tcw-side__title svg {
+  color: var(--color-primary);
+}
+
+.tcw-steps {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tcw-steps li {
+  position: relative;
+  display: flex;
+  gap: var(--space-3);
+  padding-bottom: var(--space-4);
+}
+
+.tcw-steps li:last-child {
+  padding-bottom: 0;
+}
+
+.tcw-steps li:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  top: 34px;
+  bottom: 4px;
+  left: 15px;
+  width: 2px;
+  background: var(--color-neutral-100);
+}
+
+.tcw-steps__icon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border: 2px solid var(--color-neutral-300);
+  border-radius: 50%;
+  background: var(--surface-card);
+  color: var(--color-neutral-500);
+}
+
+.tcw-steps li.is-done .tcw-steps__icon {
+  border-color: var(--color-success);
+  background: var(--color-success);
+  color: #fff;
+}
+
+.tcw-steps strong {
+  display: block;
+  font-size: var(--text-sm);
+  color: var(--color-neutral);
+}
+
+.tcw-steps p {
+  margin: 2px 0 0;
+  font-size: var(--text-xs);
+  line-height: 1.4;
+  color: var(--color-neutral-700);
+}
+
+.tcw-bell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: var(--text-xs);
+  color: var(--color-neutral-700);
+}
+
+.tcw-bell svg {
+  flex-shrink: 0;
+  color: var(--color-primary);
+}

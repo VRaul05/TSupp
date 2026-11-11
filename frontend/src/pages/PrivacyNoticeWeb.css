@@ -1,0 +1,230 @@
+.pnw-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+.pnw-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  background: var(--color-tertiary-soft);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--color-tertiary);
+}
+
+.pnw-head h1 {
+  margin: var(--space-2) 0 4px;
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--color-neutral);
+}
+
+.pnw-head p {
+  margin: 0;
+  color: var(--color-neutral-700);
+}
+
+.pnw-head__actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.pnw {
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr);
+  gap: var(--space-6);
+  align-items: start;
+}
+
+/* ---------- Índice ---------- */
+.pnw-side {
+  position: sticky;
+  top: 96px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.pnw-side .web-card {
+  padding: var(--space-5);
+}
+
+.pnw-side h2 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 var(--space-3);
+  font-size: var(--text-sm);
+  font-weight: 800;
+  color: var(--color-neutral);
+}
+
+.pnw-toc ol {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pnw-toc button {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  width: 100%;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: none;
+  text-align: left;
+  font-size: var(--text-sm);
+  line-height: 1.35;
+  color: var(--color-neutral-700);
+  cursor: pointer;
+}
+
+.pnw-toc button:hover {
+  background: var(--surface-tint);
+}
+
+.pnw-toc button.is-active {
+  background: var(--color-primary-soft);
+  font-weight: 700;
+  color: var(--color-primary-strong);
+}
+
+.pnw-toc button span {
+  flex-shrink: 0;
+  min-width: 18px;
+  font-weight: 800;
+  color: var(--color-primary);
+}
+
+.pnw-accepted {
+  margin: 0;
+}
+
+.pnw-arco p {
+  margin: 0 0 var(--space-3);
+  font-size: var(--text-xs);
+  line-height: 1.5;
+  color: var(--color-neutral-700);
+}
+
+.pnw-arco button {
+  padding: 0;
+  border: 0;
+  background: none;
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--color-tertiary);
+  cursor: pointer;
+}
+
+.pnw-arco button:hover {
+  text-decoration: underline;
+}
+
+/* ---------- Documento ---------- */
+.pnw-doc {
+  padding: var(--space-8);
+}
+
+.pnw-doc__meta {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-6);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--surface-tint);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--color-neutral-700);
+}
+
+.pnw-doc__meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pnw-section {
+  scroll-margin-top: 96px;
+  padding-bottom: var(--space-5);
+}
+
+.pnw-section + .pnw-section {
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--color-neutral-100);
+}
+
+.pnw-section h2 {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: 0 0 var(--space-2);
+  font-size: var(--text-lg);
+  font-weight: 800;
+  color: var(--color-neutral);
+}
+
+.pnw-section h2 span {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--color-primary-soft);
+  font-size: var(--text-sm);
+  color: var(--color-primary-strong);
+}
+
+.pnw-section p {
+  margin: 0;
+  max-width: 72ch;
+  padding-left: 40px;
+  font-size: var(--text-md);
+  line-height: 1.65;
+  color: var(--color-neutral-700);
+}
+
+.pnw-doc__end {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin: var(--space-4) 0 0;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--color-neutral-500);
+}
+
+/* ---------- Impresión ---------- */
+@media print {
+  .web-nav,
+  .web-footer,
+  .nrw-crumbs,
+  .pnw-head__actions,
+  .pnw-side {
+    display: none !important;
+  }
+
+  .pnw {
+    display: block;
+  }
+
+  .pnw-doc {
+    border: 0;
+    box-shadow: none;
+    padding: 0;
+  }
+}
