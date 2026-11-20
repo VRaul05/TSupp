@@ -1,9 +1,13 @@
+
 from pathlib import Path
+import os
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
+
+ENV_FILE = os.getenv("ENV_FILE", str(PROJECT_ROOT / ".env"))
 
 
 class Settings(BaseSettings):
@@ -16,7 +20,7 @@ class Settings(BaseSettings):
     jwt_access_token_expire_minutes: int = 30
 
     model_config = SettingsConfigDict(
-        env_file=PROJECT_ROOT / ".env",
+        env_file=ENV_FILE,
         extra="ignore",
     )
 

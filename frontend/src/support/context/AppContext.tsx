@@ -17,6 +17,7 @@ const generateId = (): string => {
 type Session = { role: Role; userId: string };
 type AppState = {
   session: Session | null;
+  isSessionLoading: boolean;
   login: (role: Role) => void;
   loginWithCredentials: (email: string, password: string) => Promise<void>;
   logout: () => void;
@@ -34,6 +35,7 @@ const AppContext = createContext<AppState | null>(null);
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
+  const [isSessionLoading, setIsSessionLoading] = useState(true);
   const [tickets, setTickets] = useState<Ticket[]>(loadTickets);
 
   // Recuperar solamente sesiones JWT válidas.
@@ -41,7 +43,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
     let active = true;
 
     const restoreSession = async () => {
-      if (!getSupportToken()) return;
+      if (!getSupportToken()) {
+        if (active) setIsSessionLoading(false);
+        return;
+      }
 
       try {
         const user = await getSupportProfile();
@@ -61,6 +66,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
         if (!active) return;
         clearSupportSession();
         setSession(null);
+      } finally {
+        if (active) setIsSessionLoading(false);
       }
     };
 
@@ -127,6 +134,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const login = (role: Role) => {
     clearSupportSession();
     setSession({ role, userId: role === 'empleado' ? 'empleado-1' : role === 'agente' ? 'agente-1' : 'supervisor-1' });
+    setIsSessionLoading(false);
   };
 
   // Autenticación real con FastAPI.
@@ -134,17 +142,19 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const result = await loginSupport(email, password);
     const role: Role = result.user.role === 'supervisor' ? 'supervisor' : 'agente';
     setSession({ role, userId: result.user.id });
+    setIsSessionLoading(false);
   };
 
   const logout = () => {
     clearSupportSession();
     setSession(null);
+    setIsSessionLoading(false);
     try { localStorage.removeItem('pugstic-session'); } catch { /* Ignorar error de almacenamiento. */ }
   };
 
   const reset = () => setTickets(loadTickets());
 
-  return <AppContext.Provider value={{ session, login, loginWithCredentials, logout, tickets, createTicket, updateTicket, addEntry, changeStatus, updateEntry, deleteEntry, reset }}>{children}</AppContext.Provider>;
+  return <AppContext.Provider value={{ session, isSessionLoading, login, loginWithCredentials, logout, tickets, createTicket, updateTicket, addEntry, changeStatus, updateEntry, deleteEntry, reset }}>{children}</AppContext.Provider>;
 }
 
 export function useApp() { const state = useContext(AppContext); if (!state) throw new Error('AppProvider required'); return state; }

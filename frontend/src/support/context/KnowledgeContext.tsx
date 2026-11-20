@@ -36,7 +36,7 @@ import type {
   ApiKnowledgeVersion,
 } from '../services/knowledgeApi';
 
-import { getSupportToken } from '../services/supportAuth';
+import { useApp } from './AppContext';
 
 
 type KnowledgeContextType = {
@@ -91,6 +91,9 @@ export function KnowledgeProvider({
 }: {
   children: ReactNode;
 }) {
+  // Obtener la sesión actual del portal de soporte
+  const { session } = useApp();
+
   // Artículos almacenados localmente
   const [localArticles, setLocalArticles] =
     useState<KnowledgeArticle[]>(load);
@@ -103,7 +106,7 @@ export function KnowledgeProvider({
   const [error, setError] = useState<string | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
 
-  // Consultar la API de FastAPI
+  // Consultar la API de FastAPI según la sesión actual
   useEffect(() => {
     let active = true;
 
@@ -112,7 +115,11 @@ export function KnowledgeProvider({
       setError(null);
 
       try {
-        const response = getSupportToken()
+        const isSupportUser =
+          session?.role === 'agente' ||
+          session?.role === 'supervisor';
+
+        const response = isSupportUser
           ? await getAllKnowledge()
           : await getPublicKnowledge();
 
@@ -146,7 +153,7 @@ export function KnowledgeProvider({
     return () => {
       active = false;
     };
-  }, [refreshKey]);
+  }, [refreshKey, session?.userId, session?.role]);
 
   // Persistencia de borradores locales
   useEffect(() => {

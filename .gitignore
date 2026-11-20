@@ -29,3 +29,12 @@ logs/
 
 # docker lc overrides
 compose.override.yaml
+# QA environment variables
+.env.qa
+
+# Playwright generated files
+frontend/playwright-report/
+frontend/test-results/
+
+# Generated QA report
+backend/reporte_pruebas_qa.html

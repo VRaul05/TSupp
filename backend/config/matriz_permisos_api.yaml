@@ -1,0 +1,148 @@
+
+version: "1.1"
+
+actores:
+  anon:
+    token_fixture: null
+
+  agent:
+    token_fixture: agt_a
+
+  supervisor:
+    token_fixture: sup_a
+
+  employee:
+    token_fixture: emp_a
+
+endpoints:
+  # Consultas
+  - nombre: Consultar articulos publicos
+    metodo: GET
+    ruta: /api/knowledge/public
+    permisos:
+      anon: 200
+      agent: 200
+      supervisor: 200
+      employee: 200
+
+  - nombre: Consultar articulos internos
+    metodo: GET
+    ruta: /api/knowledge
+    permisos:
+      anon: 401
+      agent: 200
+      supervisor: 200
+      employee: 403
+
+  - nombre: Consultar usuario autenticado
+    metodo: GET
+    ruta: /api/auth/me
+    permisos:
+      anon: 401
+      agent: 200
+      supervisor: 200
+      employee: 200
+
+  # Creación
+  - nombre: Crear articulo
+    metodo: POST
+    ruta: /api/knowledge
+    body:
+      title: QA Matrix Article
+      category: QA
+      content: Contenido creado desde la matriz de permisos
+      note: Prueba automatizada de permisos
+    permisos:
+      anon: 401
+      agent: 201
+      supervisor: 201
+      employee: 403
+
+  # Edición
+  - nombre: Editar articulo
+    metodo: PUT
+    ruta: /api/knowledge/{article_id}
+    preparacion: draft
+    body:
+      content: Contenido actualizado desde la matriz
+      note: Prueba automatizada de edición
+    permisos:
+      anon: 401
+      agent: 200
+      supervisor: 200
+      employee: 403
+
+  # Enviar a revisión
+  - nombre: Enviar articulo a revision
+    metodo: POST
+    ruta: /api/knowledge/{article_id}/submit
+    preparacion: draft
+    permisos:
+      anon: 401
+      agent: 200
+      supervisor: 200
+      employee: 403
+
+  # Autorizar
+  - nombre: Autorizar articulo
+    metodo: POST
+    ruta: /api/knowledge/{article_id}/authorize
+    preparacion: under_review
+    permisos:
+      anon: 401
+      agent: 403
+      supervisor: 200
+      employee: 403
+
+  # Revocar
+  - nombre: Revocar articulo
+    metodo: POST
+    ruta: /api/knowledge/{article_id}/revoke
+    preparacion: authorized
+    permisos:
+      anon: 401
+      agent: 403
+      supervisor: 200
+      employee: 403
+
+  # Restaurar versión
+  - nombre: Restaurar version anterior
+    metodo: POST
+    ruta: /api/knowledge/{article_id}/restore/1
+    preparacion: versioned
+    permisos:
+      anon: 401
+      agent: 403
+      supervisor: 200
+      employee: 403
+
+  # Eliminar
+  - nombre: Eliminar articulo
+    metodo: DELETE
+    ruta: /api/knowledge/{article_id}
+    preparacion: draft
+    permisos:
+      anon: 401
+      agent: 403
+      supervisor: 204
+      employee: 403
+
+transiciones:
+  - nombre: Enviar borrador a revision
+    origen: draft
+    destino: under_review
+    roles_permitidos:
+      - agent
+      - supervisor
+
+  - nombre: Autorizar articulo
+    origen: under_review
+    destino: authorized
+    roles_permitidos:
+      - supervisor
+
+  - nombre: Revocar articulo
+    origen: authorized
+    destino: revoked
+    roles_permitidos:
+      - supervisor
