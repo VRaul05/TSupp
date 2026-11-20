@@ -1,7 +1,9 @@
+
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import type { Role, Ticket, TicketInput, Status, Entry } from '../data/tickets';
 import { loadCollection, saveCollection } from '../data/storage';
 import { noteAttachmentOwner, removeAttachmentOwner, saveTicketAttachments } from '../data/attachments';
+import { loginSupport, getSupportProfile, getSupportToken, clearSupportSession } from '../services/supportAuth';
 
 const ticketStorageKey = 'pugstic-tickets';
 const previousDemoTicketIds = ['TCK-1042', 'TCK-1035', 'TCK-1048', 'TCK-1051'];
@@ -16,6 +18,7 @@ type Session = { role: Role; userId: string };
 type AppState = {
   session: Session | null;
   login: (role: Role) => void;
+  loginWithCredentials: (email: string, password: string) => Promise<void>;
   logout: () => void;
   tickets: Ticket[];
   createTicket: (input: TicketInput, files?: readonly File[]) => Promise<Ticket>;
@@ -26,16 +29,45 @@ type AppState = {
   deleteEntry: (ticketId: string, entryId: string) => Promise<void>;
   reset: () => void;
 };
+
 const AppContext = createContext<AppState | null>(null);
-const getSaved = <T,>(key: string, fallback: T): T => {
-  try { const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) as T : fallback; }
-  catch { return fallback; }
-};
 
 export function AppProvider({ children }: { children: ReactNode }) {
-  const [session, setSession] = useState<Session | null>(() => getSaved('pugstic-session', null));
+  const [session, setSession] = useState<Session | null>(null);
   const [tickets, setTickets] = useState<Ticket[]>(loadTickets);
-  useEffect(() => { try { localStorage.setItem('pugstic-session', JSON.stringify(session)); } catch { /* Sesión disponible en memoria. */ } }, [session]);
+
+  // Recuperar solamente sesiones JWT válidas.
+  useEffect(() => {
+    let active = true;
+
+    const restoreSession = async () => {
+      if (!getSupportToken()) return;
+
+      try {
+        const user = await getSupportProfile();
+        if (!active) return;
+
+        if (user.role !== 'agent' && user.role !== 'supervisor') {
+          clearSupportSession();
+          setSession(null);
+          return;
+        }
+
+        setSession({
+          role: user.role === 'supervisor' ? 'supervisor' : 'agente',
+          userId: user.id,
+        });
+      } catch {
+        if (!active) return;
+        clearSupportSession();
+        setSession(null);
+      }
+    };
+
+    void restoreSession();
+    return () => { active = false; };
+  }, []);
+
   useEffect(() => saveCollection(ticketStorageKey, tickets), [tickets]);
 
   const createTicket = async (input: TicketInput, files: readonly File[] = []): Promise<Ticket> => {
@@ -63,7 +95,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setTickets(previous => [ticket, ...previous]);
     return ticket;
   };
+
   const updateTicket = (id: string, patch: Partial<Ticket>) => setTickets(previous => previous.map(ticket => ticket.id === id ? { ...ticket, ...patch } : ticket));
+
   const addEntry = async (id: string, channel: 'history' | 'notes', text: string, files: readonly File[] = []): Promise<void> => {
     if (!text.trim()) return;
     const now = new Date();
@@ -72,20 +106,45 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const entry: Entry = { id: entryId, files: savedFiles, author: session?.role === 'supervisor' ? 'Supervisor' : 'Agente de soporte', text: text.trim(), time: localTime(now), private: channel === 'notes', createdAt: now.toISOString(), authorId: session?.userId };
     setTickets(previous => previous.map(ticket => ticket.id === id ? { ...ticket, [channel]: [...ticket[channel], entry] } : ticket));
   };
+
   const changeStatus = (id: string, status: Status, reason?: string) => setTickets(previous => previous.map(ticket => ticket.id === id ? { ...ticket, status, history: [...ticket.history, { id: generateId(), author: 'Sistema · acción del agente', text: `Estado: ${ticket.status} → ${status}${reason ? ' · ' + reason : ''}`, time: localTime() }] } : ticket));
+
   const canEditEntry = (entry: Entry) => entry.authorId === session?.userId && Boolean(entry.createdAt) && Date.now() - new Date(entry.createdAt!).getTime() <= 900000;
+
   const updateEntry = (ticketId: string, entryId: string, text: string) => {
     if (!text.trim()) return;
     setTickets(previous => previous.map(ticket => ticket.id === ticketId ? { ...ticket, notes: ticket.notes.map(entry => entry.id === entryId && canEditEntry(entry) ? { ...entry, text: text.trim() } : entry) } : ticket));
   };
+
   const deleteEntry = async (ticketId: string, entryId: string): Promise<void> => {
     const note = tickets.find(ticket => ticket.id === ticketId)?.notes.find(entry => entry.id === entryId);
     if (!note || !canEditEntry(note)) return;
     if (note.files?.length) await removeAttachmentOwner(noteAttachmentOwner(ticketId, entryId));
     setTickets(previous => previous.map(ticket => ticket.id === ticketId ? { ...ticket, notes: ticket.notes.filter(entry => entry.id !== entryId) } : ticket));
   };
-  const login = (role: Role) => setSession({ role, userId: role === 'empleado' ? 'empleado-1' : role === 'agente' ? 'agente-1' : 'supervisor-1' });
+
+  // Acceso simulado temporal (compatibilidad con Access.tsx).
+  const login = (role: Role) => {
+    clearSupportSession();
+    setSession({ role, userId: role === 'empleado' ? 'empleado-1' : role === 'agente' ? 'agente-1' : 'supervisor-1' });
+  };
+
+  // Autenticación real con FastAPI.
+  const loginWithCredentials = async (email: string, password: string): Promise<void> => {
+    const result = await loginSupport(email, password);
+    const role: Role = result.user.role === 'supervisor' ? 'supervisor' : 'agente';
+    setSession({ role, userId: result.user.id });
+  };
+
+  const logout = () => {
+    clearSupportSession();
+    setSession(null);
+    try { localStorage.removeItem('pugstic-session'); } catch { /* Ignorar error de almacenamiento. */ }
+  };
+
   const reset = () => setTickets(loadTickets());
-  return <AppContext.Provider value={{ session, login, logout: () => setSession(null), tickets, createTicket, updateTicket, addEntry, changeStatus, updateEntry, deleteEntry, reset }}>{children}</AppContext.Provider>;
+
+  return <AppContext.Provider value={{ session, login, loginWithCredentials, logout, tickets, createTicket, updateTicket, addEntry, changeStatus, updateEntry, deleteEntry, reset }}>{children}</AppContext.Provider>;
 }
+
 export function useApp() { const state = useContext(AppContext); if (!state) throw new Error('AppProvider required'); return state; }
