@@ -1,0 +1,3 @@
+-r requirements-dev.txt
+pgvector>=0.4,<1.0
+PyYAML>=6.0,<7.0
