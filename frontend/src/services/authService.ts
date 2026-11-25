@@ -76,7 +76,7 @@ export async function login(email: string, password: string): Promise<LoginResul
       ok: true,
       user: saveSession({
         id: "u-001",
-        name: "Ana López",
+        name: "Raúl",
         email: DEMO_EMAIL,
         role: "employee",
         area: "Dirección Administrativa",

@@ -1,0 +1,60 @@
+name: Backend Auth and Migrations
+on:
+  pull_request:
+    paths:
+      - 'backend/**'
+      - '.github/workflows/backend-auth.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/backend-auth.yml'
+permissions:
+  contents: read
+jobs:
+  backend-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: python -m pip install -r backend/requirements-dev.txt
+      - name: Run backend tests
+        working-directory: backend
+        run: python -m pytest tests/ -q
+
+  postgres-migration:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: tsupp_ci
+          POSTGRES_PASSWORD: ci_only_password
+          POSTGRES_DB: tsupp_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U tsupp_ci -d tsupp_ci"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 15
+    env:
+      DATABASE_URL: postgresql+psycopg://tsupp_ci:ci_only_password@localhost:5432/tsupp_ci
+      JWT_SECRET: this-is-only-a-non-production-ci-secret-change-for-real-deployments
+      INSTITUTIONAL_EMAIL_DOMAIN: institution.example
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: python -m pip install -r backend/requirements-auth.txt
+      - name: Apply and verify all migrations
+        working-directory: backend
+        run: |
+          python -m alembic upgrade head
+          python -m alembic check
+          python -m alembic current
